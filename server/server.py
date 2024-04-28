@@ -3,22 +3,29 @@ from flask_cors import CORS
 import joblib
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
-import warnings
+from sklearn.neighbors import NearestNeighbors
 import re
 from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
-
-warnings.simplefilter("ignore")
+from gensim.models import Word2Vec
+from gensim.utils import simple_preprocess
+from scipy.sparse import hstack
 
 app = Flask(__name__)
-CORS(app, origins="*")  
+CORS(app, origins="*")
 
 # Load the trained model
 clf = joblib.load('../models/linearSVC.pkl')
 mlb = joblib.load('../models/mlb_weights.pkl')
-
-# Load the vectorizer used for preprocessing during training
 vectorizer = joblib.load('../vectorizer/tfidf_vectorizer.pkl')
+
+word2vec_model = Word2Vec.load("../embeddings/word2vec_model.bin")
+tfidf_embeddings = joblib.load('../embeddings/tfidf_vectorizer.pkl')
+data_path = "../output/df_eda.pkl"
+df = pd.read_pickle(data_path)
+
+# Load KNN model
+with open("../embeddings/knn_model.pkl", "rb") as f:
+    knn_model = joblib.load(f)
 
 @app.route('/predict', methods=['POST'])
 def predict():
@@ -30,15 +37,42 @@ def predict():
     text_vectorized = vectorizer.transform([cleaned_text])
     # Make prediction
     prediction = clf.predict(text_vectorized)
-    print(prediction)
     predicted_tags = mlb.inverse_transform(prediction)
-    print(predicted_tags)
+    
     # Example response
     response = {
         'prediction': list(predicted_tags) 
     }
     
     return jsonify(response)
+
+@app.route('/similar_questions', methods=['POST'])
+def similar_questions():
+    data = request.get_json(force=True)
+    input_question = data['input_data']
+
+    
+
+    input_tfidf = tfidf_embeddings.transform([input_question])
+    input_word2vec = document_embedding(input_question, word2vec_model)
+
+    print("embed")
+    print(input_word2vec)
+    
+    if input_word2vec is None:
+        return jsonify({"error": "Input question not in vocabulary."}), 400
+    
+    input_embeddings = hstack([input_tfidf, input_word2vec.reshape(1, -1)])
+    
+    # Find nearest neighbors
+    _, indices = knn_model.kneighbors(input_embeddings)
+    
+    # Extract similar questions
+    similar_questions_indices = indices[0][1:]  # Exclude the input question itself
+    similar_questions = df.iloc[similar_questions_indices]['Title']
+    
+    # Return similar questions
+    return jsonify({"similar_questions": similar_questions.tolist()})
 
 def cleaning(text):
     text = text.lower()
@@ -69,6 +103,17 @@ def cleaning(text):
     tokens = word_tokenize(text)
     text = ' '.join(tokens)
     return text
+
+def document_embedding(text, model):
+    # Tokenize words
+    tokenized_text = simple_preprocess(text)
+    # Filter out words not in vocabulary
+    words_in_vocab = [word for word in tokenized_text if word in model.wv.key_to_index]
+    # If no words in vocabulary, return None
+    if not words_in_vocab:
+        return None
+    # Calculate mean of word vectors
+    return sum(model.wv[word] for word in words_in_vocab) / len(words_in_vocab)
 
 if __name__ == '__main__':
     app.run(debug=False)
