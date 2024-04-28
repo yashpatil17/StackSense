@@ -18,7 +18,8 @@ function App() {
           input_data: inputData,
         }
       );
-      setPredictions(response.data);
+      console.log(response.data.prediction[0]);
+      setPredictions(response.data.prediction[0]);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -34,7 +35,7 @@ function App() {
       <h2>Predictions:</h2>
       <ul>
         {/* {predictions} */}
-        {predictions.map((prediction, index) => (
+        {predictions?.map((prediction, index) => (
           <li key={index}>{prediction}</li>
         ))}
       </ul>
