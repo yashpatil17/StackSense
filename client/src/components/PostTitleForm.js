@@ -56,7 +56,7 @@ const MyForm = () => {
   };
 
   return (
-    <div>
+    <div style={{marginBottom: '50px'}}>
       <Container style={{ marginTop:'100px', marginBottom: '50px' , display: 'flex', justifyContent: 'space-between' }}>
         <div style={{width: '45%'}}>
         <div style={{ marginBottom: '20px' }}>
