@@ -104,7 +104,7 @@ const MyForm = () => {
         </Form.Group>
 
         <Form.Group controlId="formPastActions">
-          <Form.Label>Past Actions</Form.Label>
+          <Form.Label>What did you try and what were you expecting?</Form.Label>
           <Form.Control
             as="textarea"
             rows={3}
