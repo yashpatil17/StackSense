@@ -10,6 +10,8 @@ function App() {
   const [previousAction, setPreviousAction] = useState("");
   const [predictions, setPredictions] = useState([]);
   const [similar, setSimilar] = useState([]);
+  const [similarBody, setSimilarBody] = useState([]);
+
   const [selectedVectorizer, setSelectedVectorizer] = useState("tfidf+word2vec"); // Default value
 
   const handleQuestionChange = (event) => {
@@ -49,8 +51,9 @@ function App() {
           vectorizer: selectedVectorizer, // Include selected vectorizer option
         }
       );
-      console.log(similarResponse.data.similar_questions);
-      setSimilar(similarResponse.data.similar_questions);
+      console.log(similarResponse.data);
+      setSimilar(similarResponse.data.title);
+      setSimilarBody(similarResponse.data.body);
     } catch (error) {
       console.error("Error:", error);
     }
@@ -61,6 +64,8 @@ function App() {
     <div>
       <Navbar />
       <PostTitleForm/>
+      {similar}
+      {similarBody}
     </div>
   );
 }

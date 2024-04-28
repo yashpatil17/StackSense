@@ -14,6 +14,7 @@ const MyForm = () => {
   const [selectedVectorizer, setSelectedVectorizer] = useState('');
   const [predictions, setPredictions] = useState([]);
   const [similar, setSimilar] = useState([]);
+  const [similarBody, setSimilarBody] = useState([]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -44,8 +45,11 @@ const MyForm = () => {
         vectorizer: selectedVectorizer, // Include selected vectorizer option
       }
     );
-    console.log(similarResponse.data.similar_questions);
-    setSimilar(similarResponse.data.similar_questions);
+    // console.log(similarResponse.data.similar_questions);
+    // setSimilar(similarResponse.data.similar_questions);
+    console.log(similarResponse.data);
+      setSimilar(similarResponse.data.title);
+      setSimilarBody(similarResponse.data.body);
   } catch (error) {
     console.error("Error:", error);
   }
@@ -136,9 +140,9 @@ const MyForm = () => {
       <div style={{ width: '45%', border: '2px solid blue', padding: '10px' }}>
       <h2 style={{ textAlign: 'center' }}>Similar Questions:</h2>
       <ol>
-        {similar.map((question, index) => (
+        {similar?.map((question, index) => (
           <li key={index}>
-            <QuestionBox question={question} />
+            <QuestionBox question={question} similarBody={similarBody} index={index} />
           </li>
         ))}
       </ol>

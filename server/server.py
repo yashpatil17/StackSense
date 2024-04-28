@@ -25,6 +25,11 @@ tfidf_embeddings = joblib.load('../embeddings/tfidf_vectorizer.pkl')
 loaded_use_module = tf.saved_model.load("../embeddings/use_model")
 
 data_path = "../output/df_eda.pkl"
+
+data_path_unprocessed = "../df_pre.pkl"
+
+df_unprocessed = pd.read_pickle(data_path_unprocessed)
+
 df = pd.read_pickle(data_path)
 
 # Load KNN model
@@ -82,10 +87,15 @@ def similar_questions():
         _, indices = use_knn_model.kneighbors(input_embeddings_use)
     # Extract similar questions
     similar_questions_indices = indices[0][1:]  # Exclude the input question itself
-    similar_questions = df.iloc[similar_questions_indices]['Title']
-    
+    similar_questions = df_unprocessed.iloc[similar_questions_indices]['Title']
+    similar_questions_body = df_unprocessed.iloc[similar_questions_indices]['Body']
+
+    response = {
+        'title': list(similar_questions),
+        'body': list(similar_questions_body)
+    }
     # Return similar questions
-    return jsonify({"similar_questions": similar_questions.tolist()})
+    return jsonify(response)
 
 def cleaning(text):
     text = text.lower()
