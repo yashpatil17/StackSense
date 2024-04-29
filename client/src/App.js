@@ -8,6 +8,7 @@ function App() {
   const [previousAction, setPreviousAction] = useState("");
   const [predictions, setPredictions] = useState([]);
   const [similar, setSimilar] = useState([]);
+  const [selectedVectorizer, setSelectedVectorizer] = useState("tfidf+word2vec"); // Default value
 
   const handleQuestionChange = (event) => {
     setQuestion(event.target.value);
@@ -21,6 +22,10 @@ function App() {
     setPreviousAction(event.target.value);
   };
 
+  const handleVectorizerSelection = (vectorizer) => {
+    setSelectedVectorizer(vectorizer);
+  };
+
   const handleSubmit = async () => {
     try {
       console.log("SUBMIT");
@@ -29,6 +34,7 @@ function App() {
         "http://127.0.0.1:5000/predict",
         {
           input_data: inputDataToSend,
+          // vectorizer: selectedVectorizer, // Include selected vectorizer option
         }
       );
       console.log(predictResponse.data.prediction[0]);
@@ -38,6 +44,7 @@ function App() {
         "http://127.0.0.1:5000/similar_questions",
         {
           input_data: inputDataToSend,
+          vectorizer: selectedVectorizer, // Include selected vectorizer option
         }
       );
       console.log(similarResponse.data.similar_questions);
@@ -63,6 +70,24 @@ function App() {
       <label>Previous Action:</label>
       <br />
       <input type="text" value={previousAction} onChange={handlePreviousActionChange} />
+      <br />
+      <label>Vectorizer:</label> {/* Add label for vectorizer */}
+      <div>
+        {/* Buttons for vectorizer options */}
+        <button 
+          onClick={() => handleVectorizerSelection("tfidf+word2vec")}
+          style={{marginRight: '10px'}}
+          className={selectedVectorizer === "tfidf+word2vec" ? "active" : ""}
+        >
+          TFIDF + Word2Vec
+        </button>
+        <button 
+          onClick={() => handleVectorizerSelection("universal_sentence_embedding")}
+          className={selectedVectorizer === "universal_sentence_embedding" ? "active" : ""}
+        >
+          Universal Sentence Embedding
+        </button>
+      </div>
       <br />
       <button onClick={handleSubmit}>Predict</button>
       <br />

@@ -9,6 +9,8 @@ from nltk.tokenize import word_tokenize
 from gensim.models import Word2Vec
 from gensim.utils import simple_preprocess
 from scipy.sparse import hstack
+import tensorflow as tf
+import numpy as np
 
 app = Flask(__name__)
 CORS(app, origins="*")
@@ -20,13 +22,16 @@ vectorizer = joblib.load('../vectorizer/tfidf_vectorizer.pkl')
 
 word2vec_model = Word2Vec.load("../embeddings/word2vec_model.bin")
 tfidf_embeddings = joblib.load('../embeddings/tfidf_vectorizer.pkl')
+loaded_use_module = tf.saved_model.load("../embeddings/use_model")
+
 data_path = "../output/df_eda.pkl"
 df = pd.read_pickle(data_path)
 
 # Load KNN model
 with open("../embeddings/knn_model.pkl", "rb") as f:
     knn_model = joblib.load(f)
-
+with open("../embeddings/use_knn_model.pkl", "rb") as f:
+    use_knn_model = joblib.load(f)
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json(force=True)
@@ -50,23 +55,31 @@ def predict():
 def similar_questions():
     data = request.get_json(force=True)
     input_question = data['input_data']
-
-    
-
+    selected_vectorizer=data['vectorizer']
     input_tfidf = tfidf_embeddings.transform([input_question])
-    input_word2vec = document_embedding(input_question, word2vec_model)
 
-    print("embed")
-    print(input_word2vec)
+    if selected_vectorizer=="tfidf+word2vec":
+        input_word2vec = document_embedding(input_question, word2vec_model)
+        print("embed")
+        print(input_word2vec)
     
-    if input_word2vec is None:
-        return jsonify({"error": "Input question not in vocabulary."}), 400
+        if input_word2vec is None:
+            return jsonify({"error": "Input question not in vocabulary."}), 400
     
-    input_embeddings = hstack([input_tfidf, input_word2vec.reshape(1, -1)])
+        input_embeddings = hstack([input_tfidf, input_word2vec.reshape(1, -1)])
     
-    # Find nearest neighbors
-    _, indices = knn_model.kneighbors(input_embeddings)
+        # Find nearest neighbors
+        _, indices = knn_model.kneighbors(input_embeddings)
+
+    elif selected_vectorizer == "universal_sentence_embedding":
+
+        input_use = document_embedding_use(input_question, loaded_use_module)
+        if input_use is None:
+            return jsonify({"error": "Input question not in vocabulary."}), 400
     
+        input_embeddings_use = hstack([input_tfidf, input_use.reshape(1, -1)])
+        
+        _, indices = use_knn_model.kneighbors(input_embeddings_use)
     # Extract similar questions
     similar_questions_indices = indices[0][1:]  # Exclude the input question itself
     similar_questions = df.iloc[similar_questions_indices]['Title']
@@ -103,6 +116,10 @@ def cleaning(text):
     tokens = word_tokenize(text)
     text = ' '.join(tokens)
     return text
+
+def document_embedding_use(text, use_module):
+    embeddings = use_module([text])
+    return np.array(embeddings).squeeze()
 
 def document_embedding(text, model):
     # Tokenize words
