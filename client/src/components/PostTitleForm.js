@@ -7,6 +7,9 @@ import StackOverflowGuide from "./StackOverflowGuide";
 import PredictionsList from "./tag";
 import QuestionBox from "./QuestionBox";
 
+
+import man from '../images/man.png';
+
 const MyForm = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -232,7 +235,7 @@ const MyForm = () => {
             <Spinner />
           </div>
         ) : (
-          similar.length !== 0 && (
+          similar.length !== 0 ? (
             <div
               style={{
                 width: "45%",
@@ -273,6 +276,8 @@ const MyForm = () => {
                 )}
               </ol>
             </div>
+          ) :  (
+            <img src={man} alt="Man" style={{width: '300px', height: '400px', marginRight: '150px', marginTop: '100px'}} />
           )
         )}
       </Container>
