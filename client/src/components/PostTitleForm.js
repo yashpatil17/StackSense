@@ -164,7 +164,7 @@ const MyForm = () => {
         </div>
       ) : (
         similar.length !== 0 && (
-          <div style={{ width: '45%', border: '2px solid blue', padding: '10px' }}>
+          <div style={{ width: '45%', border: '2px solid #0d6efd', padding: '10px', borderRadius: '10px' }}>
             <h2 style={{ textAlign: 'center' }}>Similar Questions:</h2>
             <ol>
               {similar.map((question, index) => (
