@@ -16,7 +16,7 @@ const MyForm = () => {
   const [similar, setSimilar] = useState([]);
   const [similarBody, setSimilarBody] = useState([]);
 
-  const [numQuestions, setNumQuestions] = useState(5); // State variable for number of questions
+  const [numQuestions, setNumQuestions] = useState(20); // State variable for number of questions
   const [loading, setLoading] = useState(false);
 
   // Your existing code for fetching similar questions and rendering them
