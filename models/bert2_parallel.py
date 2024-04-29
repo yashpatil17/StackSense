@@ -269,7 +269,7 @@ if __name__ == '__main__':
     
 
     model = BERTClass()
-    # model = torch.nn.DataParallel(model)
+    model = torch.nn.DataParallel(model)
     model.to(device)
     print("[INFO]: model loaded to device")
 

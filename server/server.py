@@ -48,15 +48,15 @@ with open("../embeddings/use_knn_model.pkl", "rb") as f:
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 
 # Load the trained BERT model
-model = BERTClass()  # Initialize your BERT model architecture
-model = torch.nn.DataParallel(model)
+model = BERTClass()
+# model = torch.nn.DataParallel(model)
 
 checkpoint = torch.load('../models/bert.pt')
 state_dict = checkpoint['state_dict']
 
 # Remove the "module." prefix from keys (if present)
-if not next(iter(state_dict.keys())).startswith('module'):
-    state_dict = {f'module.{k}': v for k, v in state_dict.items()}
+# if not next(iter(state_dict.keys())).startswith('module'):
+#     state_dict = {f'module.{k}': v for k, v in state_dict.items()}
 model.load_state_dict(state_dict)
 model.eval()
 
@@ -67,12 +67,13 @@ def predict():
     # Preprocess text
     cleaned_text = cleaning(data['input_data'])
 
-    ##### Normal model prediction
-    # # Vectorize the cleaned text
-    # text_vectorized = vectorizer.transform([cleaned_text])
-    # # Make prediction
-    # prediction = clf.predict(text_vectorized)
-    # predicted_tags = mlb.inverse_transform(prediction)
+    #### Normal model prediction
+    # Vectorize the cleaned text
+    text_vectorized = vectorizer.transform([cleaned_text])
+    # Make prediction
+    prediction = clf.predict(text_vectorized)
+    predicted_tags = mlb.inverse_transform(prediction)
+    print("LinearSVC prediction:", predicted_tags)
 
 
     ##### BERT model prediction
@@ -93,19 +94,19 @@ def predict():
         # y_test.extend(targets.cpu().detach().numpy().tolist())
         # y_pred.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
 
-        print(outputs)
+        # print(outputs)
 
-        predicted_labels = torch.sigmoid(outputs)
-        print(predicted_labels)
+        # predicted_labels = torch.sigmoid(outputs)
+        # print(predicted_labels)
 
-        y_pred = torch.sigmoid(outputs).cpu().detach().numpy().tolist()
-        print(y_pred)
+        # y_pred = torch.sigmoid(outputs).cpu().detach().numpy().tolist()
+        # print(y_pred)
 
         # y_pred = (np.array(y_pred) > np.mean(y_pred)).astype(int)
         # print(y_pred)
 
-        y_pred = (np.array(y_pred) > 0.5).astype(int)
-        print(y_pred)
+        # y_pred = (np.array(y_pred) > 0.5).astype(int)
+        # print(y_pred)
 
 
     # predicted_tags = []
@@ -116,14 +117,39 @@ def predict():
     #     print(targets[i])
     #     predicted_tags.append(targets[i])
 
+
+    k = 5  # Choose the top k predictions
+
+    # Get the top k values and indices
+    top_values, top_indices = torch.topk(outputs, k)
+
+    # Print the corresponding target labels for the top k predictions
+    print("Top {} predicted labels:".format(k))
+    for i in range(k):
+        print("{}. {}".format(i+1, targets[top_indices[0][i].item()]))
+
+    # Store the top predicted tags in a list
+    predicted_tags = [targets[top_indices[0][i].item()] for i in range(k)]
+
+    print(predicted_tags)
+
+    print("BERT CLEANED PREDICTED TAGS")
+    cleaned_predicted_tags = [predicted_tags[0]] + [tag for tag in predicted_tags[1:] if tag in cleaned_text]
+    for tag in cleaned_predicted_tags:
+        print(tag)
+
+    print(cleaned_predicted_tags)
+
+    predicted_tags = cleaned_predicted_tags
+
     # Find the index of the maximum value in the predictions tensor
-    max_index = torch.argmax(outputs)
+    # max_index = torch.argmax(outputs)
 
-    # Print the corresponding target label
-    print("Predicted label:", targets[max_index.item()])
+    # # Print the corresponding target label
+    # print("Predicted label:", targets[max_index.item()])
 
-    predicted_tags = []
-    predicted_tags.append(targets[max_index.item()])
+    # predicted_tags = []
+    # predicted_tags.append(targets[max_index.item()])
     # max_indices = torch.nonzero(outputs == torch.max(outputs)).flatten()
     # # Print the corresponding target labels for each index
     # print("Predicted labels:")
