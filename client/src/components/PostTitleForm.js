@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Form, Button } from 'react-bootstrap';
+import { Container, Form, Button, Spinner } from 'react-bootstrap';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Question from './Question';
@@ -15,6 +15,8 @@ const MyForm = () => {
   const [predictions, setPredictions] = useState([]);
   const [similar, setSimilar] = useState([]);
   const [similarBody, setSimilarBody] = useState([]);
+
+  const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -37,7 +39,7 @@ const MyForm = () => {
     //   console.error('Error:', error);
     // }
     const inputDataToSend = `${title} ${description} ${pastActions}`; // Combine all three inputs
-
+    setLoading(true);
     const similarResponse = await axios.post(
       "http://127.0.0.1:5000/similar_questions",
       {
@@ -50,6 +52,8 @@ const MyForm = () => {
     console.log(similarResponse.data);
       setSimilar(similarResponse.data.title);
       setSimilarBody(similarResponse.data.body);
+    setLoading(false);
+
   } catch (error) {
     console.error("Error:", error);
   }
@@ -58,6 +62,11 @@ const MyForm = () => {
   const handleVectorizerSelection = (vectorizer) => {
     setSelectedVectorizer(vectorizer);
   };
+  // const Spinner = () => (
+  //   <div className="spinner" style={{ textAlign: 'center', marginTop: '20px' }}>
+  //     Loading...
+  //   </div>
+  // );
 
   return (
     <div style={{marginBottom: '50px'}}>
@@ -137,16 +146,36 @@ const MyForm = () => {
       </Form>
         <PredictionsList predictions={predictions}/> {/* Moved PredictionsList to here */}
       </div>
-      <div style={{ width: '45%', border: '2px solid blue', padding: '10px' }}>
-      <h2 style={{ textAlign: 'center' }}>Similar Questions:</h2>
-      <ol>
-        {similar?.map((question, index) => (
-          <li key={index}>
-            <QuestionBox question={question} similarBody={similarBody} index={index} />
-          </li>
-        ))}
-      </ol>
-    </div>
+      {/* {
+        similar?.length !== 0 && <div style={{ width: '45%', border: '2px solid blue', padding: '10px' }}>
+        <h2 style={{ textAlign: 'center' }}>Similar Questions:</h2>
+        <ol>
+          {similar?.map((question, index) => (
+            <li key={index}>
+              <QuestionBox question={question} similarBody={similarBody} index={index} />
+            </li>
+          ))}
+        </ol>
+      </div>
+      } */}
+      {loading ? (
+        <div className="spinner" style={{ alignItems: 'center', marginRight: '200px', display: 'flex', justifyContent: 'center' }}>
+          <Spinner />
+        </div>
+      ) : (
+        similar.length !== 0 && (
+          <div style={{ width: '45%', border: '2px solid blue', padding: '10px' }}>
+            <h2 style={{ textAlign: 'center' }}>Similar Questions:</h2>
+            <ol>
+              {similar.map((question, index) => (
+                <li key={index}>
+                  <QuestionBox question={question} similarBody={similarBody} index={index} />
+                </li>
+              ))}
+            </ol>
+          </div>
+        )
+      )}
     </Container>
     </div>
   );
