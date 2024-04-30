@@ -134,10 +134,9 @@ def predict():
     print(predicted_tags)
 
     print("BERT CLEANED PREDICTED TAGS")
-    cleaned_predicted_tags = [predicted_tags[0]] + [tag for tag in predicted_tags[1:] if tag in cleaned_text]
-    for tag in cleaned_predicted_tags:
-        print(tag)
-
+    first_tag = (predicted_tags[0],)
+    other_tags = tuple(tag for tag in predicted_tags[1:] if tag in cleaned_text)
+    cleaned_predicted_tags = [first_tag + other_tags]
     print(cleaned_predicted_tags)
 
     predicted_tags = cleaned_predicted_tags

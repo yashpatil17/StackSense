@@ -1,5 +1,4 @@
 import React from 'react';
-import logo2 from '../images/logo1.png'; // Import the image file
 
 function Question() {
   return (
