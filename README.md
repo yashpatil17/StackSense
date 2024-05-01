@@ -2,9 +2,13 @@
 
 This is a part of the CSCE 670 (Information Storage and Retrieval) project.
 
+[2 Min Video Presentation](https://www.youtube.com/watch?v=moHQKFcGLdY)
+
+[Slides](https://drive.google.com/file/d/1aXUbClkMWZTAJSOCAaURsCB9n_A4AyyS/view?usp=sharing)
+
 ## Introduction
 
-StackSense is a tool designed to enhance the user experience on StackOverflow by providing accurate tag suggestions and suggesting similar questions. It predicts tags for questions/posts, suggests similar questions using various document similarity algorithms, and presents these functionalities in a user-friendly application.
+StackSense is a tool designed to enhance the user experience on StackOverflow by providing accurate tag suggestions and suggesting similar questions. It predicts tags for questions/posts, suggests similar questions using various document similarity algorithms and presents these functionalities in a user-friendly application.
 
 ## Problem Statement
 
@@ -20,13 +24,13 @@ The tool caters to StackOverflow users seeking tag suggestions for better questi
 
 - Loaded and cleaned Questions.csv and Tags.csv.
 - Dropped duplicates and null values.
-- Dropped questions with low score.
+- Dropped questions with low scores.
 - Removed questions not belonging to the top 100 tags.
 
 ### Text Preprocessing:
 
 - Normalized text by removing HTML tags, accented characters, and stopwords.
-- Lemmatized text and cleaned punctuations.
+- Lemmatized text and cleaned punctuation.
 
 ### Exploratory Data Analysis (EDA):
 
@@ -42,11 +46,11 @@ We trained two models for the dataset:
 - LinearSVC
 - Fine-tuned BERT
 
-For BERT, we used pretrained bert-base-uncased model and fine-tuned it on our dataset with a dropout layer, output of which was sent to the final layer with no of outputs = no of labels (=100).
+For BERT, we used the pre-trained bert-base-uncased model and fine-tuned it on our dataset with a dropout layer, the output of which was sent to the final layer with no of outputs = no of labels (=100).
 
 ### Evaluation
 
-We evaluated our models based on the precision, recall, f1 score on the test data. Results:
+We evaluated our models based on the precision, recall, and f1 score on the test data. Results:
 
 #### LinearSVC
 
@@ -106,9 +110,9 @@ The client-side code is located in the `client` directory. It is developed using
 The `embeddings` and `models` folders in the root directory contain all the embeddings and model weights necessary for the project.
 If not present down all the files from [Link1](https://drive.google.com/drive/folders/1DOXw56d8L_riM6O2biOh8RC_MjchbyHs) and [Link2](https://drive.google.com/drive/folders/124W00gZwCj1clAOm5hzRG8czeD6vo1B0) and put them in embeddings folder.
 
-Download and paste the bert model in the models directory: [BERT](https://drive.google.com/file/d/1Q1EcYjj-_Ea5rGsHzdM3Rq-hyQ_nUPSc/view)
+Download and paste the BERT model in the models directory: [BERT](https://drive.google.com/file/d/1Q1EcYjj-_Ea5rGsHzdM3Rq-hyQ_nUPSc/view)
 
-Download and put this dtataset without preprocessing in the root folder StackSense: [Data](https://drive.google.com/file/d/1Q0hD6AfSMw_-q7e_2HNvJPQJFy8aVyLI/view?usp=drive_link)
+Download and put this dataset without preprocessing in the root folder StackSense: [Data](https://drive.google.com/file/d/1Q0hD6AfSMw_-q7e_2HNvJPQJFy8aVyLI/view?usp=drive_link)
 
 ## Screenshots
 *Home Screen*
