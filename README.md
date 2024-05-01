@@ -42,7 +42,7 @@ If not present down all the files from https://drive.google.com/drive/folders/1D
 ![Screenshot 5](screenshots/4.png)
 *Similar Questions with a slider to toggle the number of displayed questions*
 
-[Screenshot 6](screenshots/5.png)
+![Screenshot 6](screenshots/5.png)
 *Embedding Options for Similar Questions*
 
 
