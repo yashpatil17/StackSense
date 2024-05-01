@@ -23,11 +23,10 @@ The client-side code is located in the `client` directory. It is developed using
 ## Embeddings and Models
 
 The `embeddings` and `models` folders in the root directory contain all the embeddings and model weights necessary for the project.
+If not present down all the files from https://drive.google.com/drive/folders/1DOXw56d8L_riM6O2biOh8RC_MjchbyHs and https://drive.google.com/drive/folders/124W00gZwCj1clAOm5hzRG8czeD6vo1B0  and puth them in embeddings folder.
+
 
 ## Contributing
 
-Contributions are welcome! Please see the [contributing guidelines](CONTRIBUTING.md) for more information.
+Contributions are welcome!
 
-## License
-
-This project is licensed under the [MIT License](LICENSE).
