@@ -25,6 +25,8 @@ The client-side code is located in the `client` directory. It is developed using
 The `embeddings` and `models` folders in the root directory contain all the embeddings and model weights necessary for the project.
 If not present down all the files from https://drive.google.com/drive/folders/1DOXw56d8L_riM6O2biOh8RC_MjchbyHs and https://drive.google.com/drive/folders/124W00gZwCj1clAOm5hzRG8czeD6vo1B0  and puth them in embeddings folder.
 
+Down and paste the bert model in the models directory: https://drive.google.com/file/d/1Q1EcYjj-_Ea5rGsHzdM3Rq-hyQ_nUPSc/view 
+
 ## Screen
 
 ![Screenshot 1](screenshots/1.png)
