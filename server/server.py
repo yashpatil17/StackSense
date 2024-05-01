@@ -10,7 +10,13 @@ from gensim.models import Word2Vec
 from gensim.utils import simple_preprocess
 from scipy.sparse import hstack
 import tensorflow as tf
+import torch
+from transformers import BertTokenizer
 import numpy as np
+
+import sys
+sys.path.append('../')
+from models.bert2 import BERTClass
 
 app = Flask(__name__)
 CORS(app, origins="*")
@@ -37,17 +43,139 @@ with open("../embeddings/knn_model.pkl", "rb") as f:
     knn_model = joblib.load(f)
 with open("../embeddings/use_knn_model.pkl", "rb") as f:
     use_knn_model = joblib.load(f)
+
+# Load the BERT tokenizer
+tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
+
+# Load the trained BERT model
+model = BERTClass()
+# model = torch.nn.DataParallel(model)
+
+# checkpoint = torch.load('../models/bert.pt')
+checkpoint = torch.load('../models/bert.pt', map_location=torch.device('cpu'))
+state_dict = checkpoint['state_dict']
+
+# Remove the "module." prefix from keys (if present)
+# if not next(iter(state_dict.keys())).startswith('module'):
+#     state_dict = {f'module.{k}': v for k, v in state_dict.items()}
+model.load_state_dict(state_dict)
+model.eval()
+
 @app.route('/predict', methods=['POST'])
 def predict():
     data = request.get_json(force=True)
     
     # Preprocess text
     cleaned_text = cleaning(data['input_data'])
+
+    #### Normal model prediction
     # Vectorize the cleaned text
     text_vectorized = vectorizer.transform([cleaned_text])
     # Make prediction
     prediction = clf.predict(text_vectorized)
     predicted_tags = mlb.inverse_transform(prediction)
+    print("LinearSVC prediction:", predicted_tags)
+
+
+    ##### BERT model prediction
+    # Tokenize and preprocess the question
+    inputs = tokenizer.encode_plus(cleaned_text, None, add_special_tokens=True, max_length=256, padding='max_length', return_token_type_ids=True, truncation=True, return_tensors='pt')
+
+    targets = ['.net', 'ajax', 'algorithm', 'android', 'angularjs', 'api', 'arrays', 'asp.net', 'asp.net-mvc', 'asp.net-mvc-3', 'bash', 'c', 'c#', 'c++', 'c++11', 'cocoa', 'cocoa-touch', 'css', 'css3', 'database', 'datetime', 'debugging', 'delphi', 'django', 'eclipse', 'emacs', 'entity-framework', 'exception', 'facebook', 'function', 'gcc', 'generics', 'git', 'google-chrome', 'haskell', 'hibernate', 'html', 'html5', 'http', 'image', 'ios', 'ipad', 'iphone', 'java', 'javascript', 'jquery', 'json', 'linq', 'linux', 'list', 'math', 'matlab', 'maven', 'mongodb', 'multithreading', 'mysql', 'node.js', 'numpy', 'objective-c', 'oop', 'optimization', 'oracle', 'osx', 'performance', 'perl', 'php', 'postgresql', 'python', 'qt', 'r', 'regex', 'rest', 'ruby', 'ruby-on-rails', 'ruby-on-rails-3', 'scala', 'security', 'shell', 'spring', 'sql', 'sql-server', 'sql-server-2008', 'string', 'svn', 'swift', 'swing', 'templates', 'tsql', 'twitter-bootstrap', 'unit-testing', 'vb.net', 'vim', 'visual-studio', 'visual-studio-2010', 'wcf', 'windows', 'winforms', 'wpf', 'xcode', 'xml']
+
+    # Make prediction
+    with torch.no_grad():
+        outputs = model(ids=inputs['input_ids'], mask=inputs['attention_mask'], token_type_ids=inputs['token_type_ids'])
+
+        # ids = data['ids'].to(device, dtype = torch.long)
+        # mask = data['mask'].to(device, dtype = torch.long)
+        # token_type_ids = data['token_type_ids'].to(device, dtype = torch.long)
+        # targets = data['targets'].to(device, dtype = torch.float)
+        # outputs = model(ids, mask, token_type_ids)
+        # y_test.extend(targets.cpu().detach().numpy().tolist())
+        # y_pred.extend(torch.sigmoid(outputs).cpu().detach().numpy().tolist())
+
+        # print(outputs)
+
+        # predicted_labels = torch.sigmoid(outputs)
+        # print(predicted_labels)
+
+        # y_pred = torch.sigmoid(outputs).cpu().detach().numpy().tolist()
+        # print(y_pred)
+
+        # y_pred = (np.array(y_pred) > np.mean(y_pred)).astype(int)
+        # print(y_pred)
+
+        # y_pred = (np.array(y_pred) > 0.5).astype(int)
+        # print(y_pred)
+
+
+    # predicted_tags = []
+    # indices = np.where(y_pred == 1)[1]
+    # print(indices)
+
+    # for i in indices:
+    #     print(targets[i])
+    #     predicted_tags.append(targets[i])
+
+
+    k = 5  # Choose the top k predictions
+
+    # Get the top k values and indices
+    top_values, top_indices = torch.topk(outputs, k)
+
+    # Print the corresponding target labels for the top k predictions
+    print("Top {} predicted labels:".format(k))
+    for i in range(k):
+        print("{}. {}".format(i+1, targets[top_indices[0][i].item()]))
+
+    # Store the top predicted tags in a list
+    predicted_tags = [targets[top_indices[0][i].item()] for i in range(k)]
+
+    print(predicted_tags)
+
+    print("BERT CLEANED PREDICTED TAGS")
+    first_tag = (predicted_tags[0],)
+    other_tags = tuple(tag for tag in predicted_tags[1:] if tag in cleaned_text)
+    cleaned_predicted_tags = [first_tag + other_tags]
+    print(cleaned_predicted_tags)
+
+    predicted_tags = cleaned_predicted_tags
+
+    # Find the index of the maximum value in the predictions tensor
+    # max_index = torch.argmax(outputs)
+
+    # # Print the corresponding target label
+    # print("Predicted label:", targets[max_index.item()])
+
+    # predicted_tags = []
+    # predicted_tags.append(targets[max_index.item()])
+    # max_indices = torch.nonzero(outputs == torch.max(outputs)).flatten()
+    # # Print the corresponding target labels for each index
+    # print("Predicted labels:")
+    # for index in max_indices:
+    #     print(targets[index.item()])
+
+        
+    # # predicted_tags = mlb.inverse_transform(predd)
+    # predicted_tags = []
+
+    # # Iterate over each prediction vector
+    # for pred_vector in predd:
+    #     # Find the indices where the value is 1
+    #     indices = torch.nonzero(pred_vector).flatten()
+    #     # Print the corresponding target labels
+    #     print("Predicted labels:")
+    #     for index in indices:
+    #         print(targets[index.item()])
+    #         predicted_tags.append(targets[index.item()])
+
+    # Convert predicted labels to list
+    # predicted_labels = predicted_labels.cpu().numpy().tolist()
+
+    # Assuming your labels are binary, you can apply a threshold to convert probabilities to binary predictions
+    # predicted_tags = [1 if pred >= 0.5 else 0 for pred in predicted_labels[0]]
+
     
     # Example response
     response = {
