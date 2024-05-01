@@ -108,7 +108,7 @@ If not present down all the files from [Link1](https://drive.google.com/drive/fo
 
 Download and paste the bert model in the models directory: [BERT](https://drive.google.com/file/d/1Q1EcYjj-_Ea5rGsHzdM3Rq-hyQ_nUPSc/view)
 
-## Screen
+## Screenshots
 *Home Screen*
 ![Screenshot 1](screenshots/1.png)
 
