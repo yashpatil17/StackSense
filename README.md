@@ -108,6 +108,8 @@ If not present down all the files from [Link1](https://drive.google.com/drive/fo
 
 Download and paste the bert model in the models directory: [BERT](https://drive.google.com/file/d/1Q1EcYjj-_Ea5rGsHzdM3Rq-hyQ_nUPSc/view)
 
+Download and put this dtataset without preprocessing in the root folder StackSense: [Data](https://drive.google.com/file/d/1Q0hD6AfSMw_-q7e_2HNvJPQJFy8aVyLI/view?usp=drive_link)
+
 ## Screenshots
 *Home Screen*
 ![Screenshot 1](screenshots/1.png)
