@@ -124,8 +124,8 @@ Download and paste the bert model in the models directory: [BERT](https://drive.
 *Similar Questions with a slider to toggle the number of displayed questions*
 ![Screenshot 5](screenshots/4.png)
 
-*Embedding Options for Similar Questions*
-![Screenshot 6](screenshots/5.png)
+*Example output using Universal Sentence Encoder*
+![Screenshot 7](screenshots/7.png)
 
 
 ## Contributing
