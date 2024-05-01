@@ -9,7 +9,7 @@ from nltk.tokenize import word_tokenize
 from gensim.models import Word2Vec
 from gensim.utils import simple_preprocess
 from scipy.sparse import hstack
-# import tensorflow as tf
+import tensorflow as tf
 import torch
 from transformers import BertTokenizer
 import numpy as np
@@ -28,7 +28,7 @@ vectorizer = joblib.load('../vectorizer/tfidf_vectorizer.pkl')
 
 word2vec_model = Word2Vec.load("../embeddings/word2vec_model.bin")
 tfidf_embeddings = joblib.load('../embeddings/tfidf_vectorizer.pkl')
-# loaded_use_module = tf.saved_model.load("../embeddings/use_model")
+loaded_use_module = tf.saved_model.load("../embeddings/use_model")
 
 data_path = "../output/df_eda.pkl"
 
@@ -51,7 +51,8 @@ tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
 model = BERTClass()
 # model = torch.nn.DataParallel(model)
 
-checkpoint = torch.load('../models/bert.pt')
+# checkpoint = torch.load('../models/bert.pt')
+checkpoint = torch.load('../models/bert.pt', map_location=torch.device('cpu'))
 state_dict = checkpoint['state_dict']
 
 # Remove the "module." prefix from keys (if present)
@@ -203,15 +204,15 @@ def similar_questions():
         # Find nearest neighbors
         _, indices = knn_model.kneighbors(input_embeddings)
 
-    # elif selected_vectorizer == "universal_sentence_embedding":
+    elif selected_vectorizer == "universal_sentence_embedding":
 
-    #     input_use = document_embedding_use(input_question, loaded_use_module)
-    #     if input_use is None:
-    #         return jsonify({"error": "Input question not in vocabulary."}), 400
+        input_use = document_embedding_use(input_question, loaded_use_module)
+        if input_use is None:
+            return jsonify({"error": "Input question not in vocabulary."}), 400
     
-    #     input_embeddings_use = hstack([input_tfidf, input_use.reshape(1, -1)])
+        input_embeddings_use = hstack([input_tfidf, input_use.reshape(1, -1)])
         
-    #     _, indices = use_knn_model.kneighbors(input_embeddings_use)
+        _, indices = use_knn_model.kneighbors(input_embeddings_use)
     # Extract similar questions
     similar_questions_indices = indices[0][1:]  # Exclude the input question itself
     similar_questions = df_unprocessed.iloc[similar_questions_indices]['Title']
