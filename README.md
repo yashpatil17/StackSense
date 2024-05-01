@@ -68,7 +68,7 @@ We evaluated our models based on the precision, recall, and f1 score on the test
 - Hamming loss: 0.010198395422600908
 - Jaccard score: 0.396155545735749
 
-Based on the scores, we observed that BERT performed far better than LinearSVC. So, we decided to use BERT for the tag prediction.
+Based on the scores, we observed that BERT performed far better than LinearSVC. Also, BERT predicted the tags correctly even on unseen questions which were not part of the database. So, we decided to use BERT for the tag prediction.
 
 ### Question Recommendation
 
