@@ -33,16 +33,16 @@ If not present down all the files from https://drive.google.com/drive/folders/1D
 ![Screenshot 2](screenshots/2.png)
 *Ask a Question*
 
-[Screenshot 1](screenshots/3.png)
+![Screenshot 3](screenshots/3.png)
 *Example Input Question*
 
-![Screenshot 2](screenshots/6.png)
+![Screenshot 4](screenshots/6.png)
 *Example Output*
 
-![Screenshot 2](screenshots/4.png)
+![Screenshot 5](screenshots/4.png)
 *Similar Questions with a slider to toggle the number of displayed questions*
 
-[Screenshot 1](screenshots/5.png)
+[Screenshot 6](screenshots/5.png)
 *Embedding Options for Similar Questions*
 
 
