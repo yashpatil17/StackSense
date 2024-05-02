@@ -6,6 +6,8 @@ This is a part of the CSCE 670 (Information Storage and Retrieval) project.
 
 [Slides](https://drive.google.com/file/d/1aXUbClkMWZTAJSOCAaURsCB9n_A4AyyS/view?usp=sharing)
 
+[GitHub Repo](https://github.com/yashpatil17/StackSense)
+
 ## Introduction
 
 StackSense is a tool designed to enhance the user experience on StackOverflow by providing accurate tag suggestions and suggesting similar questions. It predicts tags for questions/posts, suggests similar questions using various document similarity algorithms and presents these functionalities in a user-friendly application.
